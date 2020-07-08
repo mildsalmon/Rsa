@@ -7,16 +7,20 @@ int main(void)
 {
 	Rsa rsa;
 	Key key = rsa.produce_keys();
-	cout << "ç»è¿‡åŠ å¯†å¾—å‡ºçš„å„é’¥åŒ™å¦‚ä¸‹ï¼š"<< endl;
-	cout << "å…¬é’¥ï¼š" << key.pkey << endl;
-	cout << "åŠ å¯†å¯†é’¥ï¼š" << key.ekey << endl;
-	cout << "è§£å¯†å¯†é’¥ï¼š" << key.dkey << endl;
+	cout << "=====================================" << endl;
+	cout << "¾ÏÈ£È­ ÈÄ ¾òÀº Å°´Â ´ÙÀ½°ú °°½À´Ï´Ù."<< endl;
+	cout << "n Å° : " << key.pkey << endl;
+	cout << "¾ÏÈ£È­ Å° (°ø°³Å°) : " << key.ekey << endl;
+	cout << "¾ÏÈ£ ÇØµ¶ Å° (°³ÀÎÅ°) : " << key.dkey << endl;
+	cout << "=====================================\n" << endl;
 	long msg;
-	cout << "è¯·è¾“å…¥è¦åŠ å¯†çš„ä¿¡æ¯ï¼ˆæ•°å­—ï¼Œä¸èƒ½è¿‡å¤§ï¼‰ï¼š" << endl;
+	cout << "¾ÏÈ£È­ÇÒ Á¤º¸¸¦ ÀÔ·ÂÇÏ½Ê½Ã¿À (¼ýÀÚ, ³Ê¹« Å¬ ¼ö ¾øÀ½) : ";
 	cin >> msg;
+	cout << "\n=====================================" << endl;
 	long msg_des = rsa.endecrypt(msg, key.ekey, key.pkey);
-	cout << "åŠ å¯†åŽä¿¡æ¯ä¸ºï¼š" << msg_des << endl;
+	cout << "¾ÏÈ£È­µÈ Á¤º¸´Â ´ÙÀ½°ú °°½À´Ï´Ù : " << msg_des << endl;
 	msg_des = rsa.endecrypt(msg_des, key.dkey, key.pkey);
-	cout << "è§£å¯†åŽä¿¡æ¯ä¸ºï¼š" << msg_des << endl;
+	cout << "¾ÏÈ£ ÇØµ¶µÈ ¸Þ½ÃÁö´Â ´ÙÀ½°ú °°½À´Ï´Ù : " << msg_des << endl;
+	cout << "=====================================" << endl;
 	return 0;
 }

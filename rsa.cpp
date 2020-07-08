@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <bitset>
+#include <iostream>
 
 using namespace std;
 
@@ -12,7 +14,12 @@ Rsa::Rsa()
 Rsa::~Rsa()
 {
 }
-
+/***********************************************************************
+¾ÏÈ£È­ º¹È£È­¸¦ µ¿½Ã¿¡ ÁøÇàÇÏ´Â ¸Ş¼Òµå
+c = m^e mod n
+m = c^d mod n
+¶ó´Â ½ÄÀº °°°í º¯¼ö¸¸ ¸Å°³°ª¸¸ ¹Ù²î¸é µÇ¹Ç·Î ÇÏ³ªÀÇ ¸Ş¼Òµå¿¡¼­ Ã³¸®ÇÔ
+***********************************************************************/
 long Rsa::endecrypt(const long msg, const long key, const long pkey)
 {
 	long msg_des = 1;
@@ -20,34 +27,42 @@ long Rsa::endecrypt(const long msg, const long key, const long pkey)
 	long index = key;
 	while (index)
 	{
-		if (index & 1)
+		//cout << bitset<32>(index) << endl;
+		if (index & 1) {
 			msg_des = (msg_des * root) % pkey;
+			//cout << "msg_des : " << msg_des << endl;
+		}
 		index >>= 1;
+		//cout << "b root : " << root << endl;
 		root = (root * root) % pkey;
+		//cout << "a root : " << root << endl;
 	}
 	return msg_des;
 }
 
+
 /************************************
- * ç”Ÿæˆé’¥åŒ™
+ p¿Í q¸¦ »ı¼ºÇØ¼­
+ n, e, d Å°¸¦ »ı¼º
  * *********************************/
 Key Rsa::produce_keys()
 {
-	long prime1 = produce_prime();
-	long prime2 = produce_prime();
-	while (prime2 == prime1)
-		prime2 = produce_prime();
+	long prime1 = produce_prime();	// p
+	long prime2 = produce_prime();	// q
+	while (prime2 == prime1)		// p¿Í q´Â nÀ» ¸¸µé°í Æó±âÇØ¾ß ÇÏ±â ¶§¹®¿¡
+		prime2 = produce_prime();	// µû·Î ÀúÀåÇØ¼­ ¸Ş¼Òµå ¹ÛÀ¸·Î »©Áö ¾ÊÀ½
 
 	Key key;
-	long orla = produce_orla(prime1, prime2);
-	key.pkey = produce_pkey(prime1, prime2);
-	key.ekey = produce_ekey(orla);
-	key.dkey = produce_dkey(key.ekey, orla);
+	long orla = produce_orla(prime1, prime2);	// ¿ÀÀÏ·¯ n »ı¼º
+	key.pkey = produce_pkey(prime1, prime2);	// n »ı¼º
+	key.ekey = produce_ekey(orla);				// e »ı¼º
+	key.dkey = produce_dkey(key.ekey, orla);	// d »ı¼º
 	return key;
 }
 
 /************************************
- *	ç”Ÿæˆå…¬é’¥ 
+ N Å° »ı¼º
+ p * q
  * *********************************/
 long Rsa::produce_pkey(const long prime1, const long prime2)
 {
@@ -55,30 +70,30 @@ long Rsa::produce_pkey(const long prime1, const long prime2)
 }
 
 /************************************
- *	ç”Ÿæˆæ¬§æ‹‰æ•°
- * *********************************/
+ ¿ÀÀÏ·¯ n »ı¼º
+************************************/
 long Rsa::produce_orla(const long prime1, const long prime2)
 {
 	return (prime1 - 1) * (prime2 - 1);
 }
 
 /************************************
- *	ç”ŸæˆåŠ å¯†å¯†é’¥
+ ¾ÏÈ£È­ Å° (°ø°³Å°) e »ı¼º
  * *********************************/
 long Rsa::produce_ekey(const long orla)
 {
 	long ekey;
 	while (true)
 	{
-		ekey = rand() % orla;
-		if (ekey >= 2 && produce_gcd(ekey, orla) == 1)
+		ekey = rand() % orla;	// ·£´ı ¼ö¸¦ ¿ÀÀÏ·¯ nÀ¸·Î ³ª¸ÓÁö ¿¬»ê
+		if (ekey >= 2 && produce_gcd(ekey, orla) == 1)	// e-key¿Í ¿ÀÀÏ·¯ nÀÌ ¼­·Î¼ÒÀÎÁö ÆÇº°
 			break;
 	}
 	return ekey;
 }
 
 /************************************
- *	ç”Ÿæˆè§£å¯†é’¥åŒ™
+ º¹È£È­ Å° (°³ÀÎÅ°) d »ı¼º
  * *********************************/
 long Rsa::produce_dkey(const long ekey, const long orla)
 {
@@ -94,7 +109,7 @@ long Rsa::produce_dkey(const long ekey, const long orla)
 }
 
 /************************************
- *	äº§ç”Ÿéšæœºç´ æ•°ï¼ŒèŒƒå›´ä¸º[100, 200) 
+ [100, 200] ¹üÀ§¿¡¼­ ÀÓÀÇÀÇ ¼Ò¼ö »ı¼º
  * *********************************/
 long Rsa::produce_prime()
 {
@@ -110,7 +125,7 @@ long Rsa::produce_prime()
 }
 
 /************************************
- * äº§ç”Ÿä¸¤ä¸ªæ•°çš„æœ€å¤§å…¬çº¦æ•°			
+ µÎ ¼ıÀÚÀÇ ÃÖ´ë °ø¾à¼ö »ı¼º		
  * *********************************/
 long Rsa::produce_gcd(const long a, const long b)
 {
@@ -127,7 +142,7 @@ long Rsa::produce_gcd(const long a, const long b)
 }
 
 /************************************
- * åˆ¤æ–­æ˜¯å¦ä¸ºç´ æ•°ï¼Œæ•ˆç‡è¾ƒä½ï¼Œä»£æ”¹è¿›
+ ¼Ò¼öÀÎÁö ÆÇ´Ü
  * *********************************/
 bool Rsa::is_prime(const long digit)
 {

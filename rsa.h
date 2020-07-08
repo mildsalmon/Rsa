@@ -3,9 +3,9 @@
 
 typedef struct key
 {
-	long pkey;
-	long ekey;
-	long dkey;
+	long pkey;	// 초기 2개의 소수 p와 q가 곱해서 나오는 n이 저장될 변수
+	long ekey;	// public-key
+	long dkey;	// private-key
 } Key;
 
 class Rsa
